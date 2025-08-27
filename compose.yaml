@@ -1,0 +1,19 @@
+services:
+
+  db:
+    image: mariadb:11.4
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_USER: foo
+      MARIADB_PASSWORD: "bar"
+      MARIADB_DATABASE: wp
+    ports:
+      - 3306:3306
+    volumes:
+      - ./data:/var/lib/mysql
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

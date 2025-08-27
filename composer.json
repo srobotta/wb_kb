@@ -1,0 +1,15 @@
+{
+    "name": "stephan/kb",
+    "description": "Extract and check artiles from a Wordpress Kowledge Base.",
+    "type": "project",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Stephan Robotta",
+            "email": "stephan.robotta@bfh.ch"
+        }
+    ],
+    "require": {
+        "paquettg/php-html-parser": "^3.1"
+    }
+}
