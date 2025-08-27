@@ -9,7 +9,7 @@ $id = 0;
 
 for ($i = 1; $i < $_SERVER['argc']; $i++) {
     if (substr($_SERVER['argv'][$i], 0, 2) === '--') {
-        if ($_SERVER['argv'][$i] === '--verbose') {
+        if ($_SERVER['argv'][$i] === '--dump') {
             $long = true;
             continue;
         }
