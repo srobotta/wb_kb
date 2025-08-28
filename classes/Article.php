@@ -183,6 +183,24 @@ class Article {
     }
 
     /**
+     * Retrieve all inline PDF that are not part of a link.
+     * @return array
+     */
+    public function getInlinePdf(): array
+    {
+        $pdf = [];
+        // Eliminate all links:
+        $content = preg_replace('/<a[^>]*>.*?<\/a>/', '', $this->post_content);
+        // Check for the remaining inline PDF that are rendered in a js reader on Wordpress.
+        if (preg_match_all('/\bhttp.*?\.pdf\b/', $content, $matches)) {
+            foreach ($matches[0] as $match) {
+                $pdf[$match] = true;
+            }
+        }
+        return $pdf;
+    }
+
+    /**
      * Returns an array of the link content of the cc link and an image, in case there is one.
      *
      * @return array

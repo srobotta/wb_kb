@@ -90,3 +90,9 @@ if (!empty($ccLicense)) {
     }
     echo PHP_EOL;
 }
+
+// Check for inline PDF (not links)
+$pdf = $article->getInlinePdf();
+if (!empty($pdf)) {
+    echo "Inline PDF: " . implode(', ', array_keys($pdf)) . PHP_EOL;
+}
