@@ -2,7 +2,7 @@
 
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
 
-use PHPHtmlParser\Dom;
+use KnowledgeBase\Kb;
 
 $long = false;
 $id = 0;
@@ -31,6 +31,7 @@ if (empty($articles)) {
     echo "Article/post with ID $id not found\n";
     exit(1);
 }
+/** @var $article \KnowledgeBase\Article */
 $article = null;
 foreach ($articles as $article) {
     break;
@@ -39,22 +40,53 @@ if ($long) {
     print_r($article);
     exit(0);
 }
-$headlines = '';
-// parse the HTML content using php-html-parser
-$dom = new Dom;
-$dom->loadStr($article->post_content);
-foreach ($dom->find('h2') as $h2) {
-    $headlines .= PHP_EOL . "\t\t" . $h2->innerHTML;
-}
 
-$category = implode(' > ', array_map(fn($c) => $c->name, array_shift($article->categories)));
-$tags = implode(', ', array_map(fn($t) => $t->name, $article->tags));
+//$headlines = PHP_EOL . "\t" . implode(PHP_EOL . "\t", $article->getH2List());
+$headlines = PHP_EOL . implode(PHP_EOL, array_map(
+    fn($headline) => str_repeat('  ', $headline['level']) . $headline['label'],
+    $article->getAllHeadlines()
+));
+$tags = implode(', ', $article->getTagsList());
 
 echo "ID: {$article->ID}
 Post date: {$article->post_date}
 Modified: {$article->post_modified}
 Title: {$article->post_title}
 Headlines: {$headlines}
-Category: {$category}
+Category: {$article->getCategoryStr()}
 Keywords: {$tags}
 ";
+
+// Check for headlines with empty content following.
+$emptyHeadlines = $article->getEmptyHeadlines();
+if (!empty($emptyHeadlines)) {
+    echo "\nThese headlines have no content:\n  " . implode("\n  ", $emptyHeadlines) . "\n";
+}
+
+// When a glossary entry, check that the expected headlines are in the correct order.
+if ($article->isGlossarEntry()) {
+    $glossaryEntryHeadlines = [
+        'Beschreibung/Definition',
+        'Empfehlungen',
+        'Vertiefung zum Thema',
+        'Verwandte Themen',
+        'Literatur',
+    ];
+    if (empty($article->getH2List())) {
+        echo "\nNo headlines found to check with expected structure.\n";
+    }
+    else if (!$article->checkHeadlineSequence($glossaryEntryHeadlines)) {
+        echo "\nGlossary article does contain different headlines or in a different order:\n";
+        echo implode(', ', array_intersect($glossaryEntryHeadlines, $article->getH2List())) . PHP_EOL;
+    }
+}
+
+// Check, whether the article has a cc license.
+$ccLicense = $article->getCcLicense();
+if (!empty($ccLicense)) {
+    echo "License: {$ccLicense[0]}";
+    if (count($ccLicense) > 1) {
+        echo '  ' . $ccLicense[1];
+    }
+    echo PHP_EOL;
+}
