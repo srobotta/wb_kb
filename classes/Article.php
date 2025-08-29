@@ -14,6 +14,8 @@ class Article {
      */
     private array|null $_headlines;
 
+    private array|null $_pdf;
+
     /**
      * Create the object from the result of the database stdObj.
      */
@@ -23,6 +25,7 @@ class Article {
             $this->$property = $value;
         }
         $this->_headlines = null;
+        $this->_pdf = null;
     }
 
     /**
@@ -188,16 +191,18 @@ class Article {
      */
     public function getInlinePdf(): array
     {
-        $pdf = [];
-        // Eliminate all links:
-        $content = preg_replace('/<a[^>]*>.*?<\/a>/', '', $this->post_content);
-        // Check for the remaining inline PDF that are rendered in a js reader on Wordpress.
-        if (preg_match_all('/\bhttp.*?\.pdf\b/', $content, $matches)) {
-            foreach ($matches[0] as $match) {
-                $pdf[$match] = true;
+        if ($this->_pdf === null) {
+            $this->_pdf = [];
+            // Eliminate all links:
+            $content = preg_replace('/<a[^>]*>.*?<\/a>/', '', $this->post_content);
+            // Check for the remaining inline PDF that are rendered in a js reader on Wordpress.
+            if (preg_match_all('/\bhttp.*?\.pdf\b/', $content, $matches)) {
+                foreach ($matches[0] as $match) {
+                    $this->_pdf[$match] = true;
+                }
             }
         }
-        return $pdf;
+        return $this->_pdf;
     }
 
     /**
