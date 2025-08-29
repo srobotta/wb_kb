@@ -201,6 +201,29 @@ class Article {
     }
 
     /**
+     * Approx count of words of a post.
+     *
+     * @return int
+     */
+    public function wordcount(): int
+    {
+        return count(array_filter(
+            explode(' ', strip_tags($this->post_content)),
+            fn($s) => !empty(trim($s))
+        )); 
+    }
+
+    /**
+     * Interlal permalink without slug.
+     *
+     * @return string
+     */
+    public function permalink(): string
+    {
+        return substr($this->guid, 0, strpos($this->guid, '/', 10)) . '/?p=' . $this->ID;
+    }
+
+    /**
      * Returns an array of the link content of the cc link and an image, in case there is one.
      *
      * @return array

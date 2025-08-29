@@ -49,12 +49,14 @@ $headlines = PHP_EOL . implode(PHP_EOL, array_map(
 $tags = implode(', ', $article->getTagsList());
 
 echo "ID: {$article->ID}
+Link: {$article->permalink()}
 Post date: {$article->post_date}
 Modified: {$article->post_modified}
 Title: {$article->post_title}
 Headlines: {$headlines}
 Category: {$article->getCategoryStr()}
 Keywords: {$tags}
+Words: {$article->wordcount()}
 ";
 
 // Check for headlines with empty content following.
