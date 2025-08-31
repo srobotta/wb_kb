@@ -39,8 +39,9 @@ foreach (Kb::getArticles() as $article) {
         else if (!$article->checkHeadlineSequence($glossaryEntryHeadlines)) {
             $headlineCheck = false;
             $error[] = 'Glossary article contains other headlines or in a different order.'
-                . '<br/>'
-                . implode(', ', array_intersect($glossaryEntryHeadlines, $article->getH2List()));
+                . '<br/>contained: '
+                . implode(', ', $article->getH2List())
+                . '  - expected: ' . implode(', ', $glossaryEntryHeadlines);
         }
     }
     // Check for headlines with empty content following.
@@ -50,7 +51,18 @@ foreach (Kb::getArticles() as $article) {
         $error[] = 'These headlines have no content:'
             . '<ul><li>' . implode('</li><li>', $emptyHeadlines) . '</li></ul>';
     }
+    $h1headlines = array_filter($article->getAllHeadlines(), fn($h1) => $h1['level'] === 1);
+    if (!empty($h1headlines)) {
+        $error[] = 'H1 headline found: ' . implode(', ', array_map(fn($h) => $h['label'], $h1headlines));
+    }
 
+    if (empty($article->getTagsList())) {
+        $error[] = 'Article has no keywords set.';
+    }
+
+    $info['Article into'] = Kb::checkPostIntro($article);
+
+    // Check if article contains an inline PDF that is displayed at the page with some javascript.
     if (!empty($article->getInlinePdf())) {
         $info['Inline PDF'] = '<ul><li>' . implode('</li><li>', array_keys($article->getInlinePdf())) . '</li></ul>';
     }

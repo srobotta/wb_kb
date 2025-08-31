@@ -165,21 +165,29 @@ class Article {
     }
 
     /**
-     * Get all headlines (h2 - h5) in the order as they appear in the content.
+     * Get all headlines (h1 - h5) in the order as they appear in the post content.
+     * We include here h1 headlines although they should not appear in the post content.
      * @return array
      */
     public function getAllHeadlines(): array
     {
         $headlines = [];
         $dom = new Dom;
-        $dom->loadStr($this->post_content);
-        foreach ($dom->find('*') as $tag) {
-            if (\in_array($tag->tag->name(), ['h2', 'h3', 'h4', 'h5'])) {
-                $level = (int)substr($tag->tag->name(), 1);
+        $dom->loadStr("<body>{$this->post_content}</body>");
+        $elements = [$dom->find('body')[0]->firstChild()];
+        while ($el = \array_shift($elements)) {
+            if (\in_array($el->tag->name(), ['h1', 'h2', 'h3', 'h4', 'h5'])) {
+                $level = (int)substr($el->tag->name(), 1);
                 $headlines[] = [
                     'level' => $level,
-                    'label' => $tag->text(),
+                    'label' => strip_tags($el->innerHTML),
                 ];
+            }
+            if ($el->tag->name() !== 'text' && $el->hasChildren()) {
+                $elements[] = $el->firstChild();
+            }
+            if ($el->hasNextSibling()) {
+                $elements[] = $el->nextSibling();
             }
         }
         return $headlines;
@@ -256,5 +264,77 @@ class Article {
             }
         }
         return $res;
+    }
+
+    /**
+     * Check with what the article starts.
+     *
+     * @return string
+     */
+    function checkPostIntro(): string {
+
+        // Load the DOM parser
+        $dom = new Dom;
+        $dom->loadStr("<body>{$this->post_content}</body>");
+
+        // Find all top-level elements inside the content
+        $el = $dom->find('body')[0]->firstChild();
+
+        // Loop through elements to find the first significant tag
+        while ($el) {
+            $tagName = $el->tag->name();
+            // First check for empty or abitrary text nodes, that come with spaces and newlines.
+            if ($tagName === 'text') {
+
+                if (trim($el->text) === '') {
+                    // Skip empty text nodes / whitespace
+                    if ($el->hasNextSibling()) {
+                        $el = $el->nextSibling();
+                        continue;
+                    }
+                }
+
+                // If the text starts with someting like [caption id="attachment_6660" align="alignnone" width="595"]
+                // then that is an image.
+                if (strpos(trim($el->text), '[caption ') === 0) {
+                    return 'starts_with_image';
+                }
+
+                // Apparently some other text.
+                return 'starts_with_text';
+            }
+
+            // Case 1: First element is an image
+            if ($tagName === 'img' || ($tagName === 'figure' && $el->find('img')->count() > 0)) {
+                return 'starts_with_image';
+            }
+
+            // Case 2: First element is a subheadline AND next is an image
+            if (\in_array($tagName, ['h2', 'h3', 'h4', 'h5'])) {
+                // Check next element if available
+                if ($el->hasNextSibling()) {
+                    $nextEl = $el->nextSibling();
+                    $nextTagName = $nextEl->tag->name();
+                    if (
+                        $nextTagName === 'img' ||
+                        ($nextTagName === 'figure' && $nextEl->find('img')->count() > 0) ||
+                        ($nextTagName === 'text' && strpos(trim($nextEl->text), '[caption ') === 0)
+                    ) {
+                        return 'starts_with_subheadline_and_image';
+                    }
+                }
+                return 'starts_with_subheadline';
+            }
+            // We are here because we have an element, e.g. a div or span or whatever.
+            if ($el->hasChildren()) {
+                $el = $el->firstChild();
+            } else if ($el->hasNextSibling()) {
+                $el = $el->nextSibling();
+            } else {
+                $el = null;
+            }
+        }
+
+        return 'no_content';
     }
 }

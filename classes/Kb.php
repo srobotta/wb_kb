@@ -53,6 +53,26 @@ class Kb {
         } while (count($res) === $limit);
     }
 
+    public static function checkPostIntro(Article $article): string
+    {
+        switch ($article->checkPostIntro()) {
+            case 'starts_with_image':
+                return "This article starts with an image.";
+                break;
+            case 'starts_with_subheadline_and_image':
+                return "This article starts with a subheadline and an image.";
+                break;
+            case 'starts_with_subheadline':
+                return "This article starts with a subheadline.";
+                break;
+            case 'starts_with_text':
+                return  "This article starts with text.";
+                break;
+            default:
+                return "Content not found.";
+        }
+    }
+
     protected static function getLatestRevision(object $post): object
     {
         $properties = ['post_content', 'post_title', 'post_excerpt', 'post_modified',

@@ -46,7 +46,9 @@ $headlines = PHP_EOL . implode(PHP_EOL, array_map(
     fn($headline) => str_repeat('  ', $headline['level']) . $headline['label'],
     $article->getAllHeadlines()
 ));
+
 $tags = implode(', ', $article->getTagsList());
+$postIntro = Kb::checkPostIntro($article);
 
 echo "ID: {$article->ID}
 Link: {$article->permalink()}
@@ -57,6 +59,7 @@ Headlines: {$headlines}
 Category: {$article->getCategoryStr()}
 Keywords: {$tags}
 Words: {$article->wordcount()}
+Intro: {$postIntro}
 ";
 
 // Check for headlines with empty content following.
@@ -79,7 +82,8 @@ if ($article->isGlossarEntry()) {
     }
     else if (!$article->checkHeadlineSequence($glossaryEntryHeadlines)) {
         echo "\nGlossary article does contain different headlines or in a different order:\n";
-        echo implode(', ', array_intersect($glossaryEntryHeadlines, $article->getH2List())) . PHP_EOL;
+        echo 'in article: ' . implode(', ', $article->getH2List()) . PHP_EOL;
+        echo 'expected: ' . implode(', ', $glossaryEntryHeadlines) . PHP_EOL;
     }
 }
 
