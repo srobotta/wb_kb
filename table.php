@@ -25,23 +25,16 @@ foreach (Kb::getArticles() as $article) {
 
     $headlineCheck = true;
     if ($article->isGlossarEntry()) {
-        $glossaryEntryHeadlines = [
-            'Beschreibung/Definition',
-            'Empfehlungen',
-            'Vertiefung zum Thema',
-            'Verwandte Themen',
-            'Literatur',
-        ];
         if (empty($article->getH2List())) {
             $headlineCheck = false;
             $error[] = 'Glossary article contains no headlines to check with expected structure.';
         }
-        else if (!$article->checkHeadlineSequence($glossaryEntryHeadlines)) {
+        else if (!$article->checkHeadlineSequence(explode(',', $CFG['GLOSSARY_HEADLINES']))) {
             $headlineCheck = false;
             $error[] = 'Glossary article contains other headlines or in a different order.'
                 . '<br/>contained: '
                 . implode(', ', $article->getH2List())
-                . '  - expected: ' . implode(', ', $glossaryEntryHeadlines);
+                . '  - expected: ' . str_replace(',', ', ', $CFG['GLOSSARY_HEADLINES']);
         }
     }
     // Check for headlines with empty content following.

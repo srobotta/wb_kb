@@ -70,20 +70,13 @@ if (!empty($emptyHeadlines)) {
 
 // When a glossary entry, check that the expected headlines are in the correct order.
 if ($article->isGlossarEntry()) {
-    $glossaryEntryHeadlines = [
-        'Beschreibung/Definition',
-        'Empfehlungen',
-        'Vertiefung zum Thema',
-        'Verwandte Themen',
-        'Literatur',
-    ];
     if (empty($article->getH2List())) {
         echo "\nNo headlines found to check with expected structure.\n";
     }
-    else if (!$article->checkHeadlineSequence($glossaryEntryHeadlines)) {
+    else if (!$article->checkHeadlineSequence(explode(',', $CFG['GLOSSARY_HEADLINES']))) {
         echo "\nGlossary article does contain different headlines or in a different order:\n";
         echo 'in article: ' . implode(', ', $article->getH2List()) . PHP_EOL;
-        echo 'expected: ' . implode(', ', $glossaryEntryHeadlines) . PHP_EOL;
+        echo 'expected: ' . str_replace(',', ', ', $CFG['GLOSSARY_HEADLINES']) . PHP_EOL;
     }
 }
 
