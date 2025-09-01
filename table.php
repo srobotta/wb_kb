@@ -67,6 +67,10 @@ foreach (Kb::getArticles() as $article) {
             $info['License'] .= '<br/>' . $ccLicense[1];
         }
     }
+    // Check for autor
+    if ($article->getAuthorDisplayName() !== $CFG['POST_AUTHOR']) {
+        $error[] = 'Author is ' . $article->getAuthorDisplayName() . ' <> ' . $CFG['POST_AUTHOR'];
+    }
 
     $editlink = str_replace(
         "?p={$article->ID}",

@@ -43,6 +43,18 @@ class Article {
     }
 
     /**
+     * Get display name of author.
+     *
+     * @return string
+     */
+    public function getAuthorDisplayName(): string
+    {
+        return \array_key_exists((int)$this->post_author, Kb::getUsersDisplayName())
+            ? Kb::getUsersDisplayName()[(int)$this->post_author]
+            : '';
+    }
+
+    /**
      * Get the tag names attached to this article.
      *
      * @return array

@@ -53,6 +53,24 @@ class Kb {
         } while (count($res) === $limit);
     }
 
+    public static function getUsersDisplayName(): array
+    {
+        static $users;
+
+        if ($users === null) {
+            $users = [];
+            $sql = '
+                SELECT ID, display_name
+                FROM {users}
+            ';
+            $res = Db::query($sql);
+            foreach ($res as $row) {
+                $users[(int)$row->ID] = $row->display_name;
+            }
+        }
+        return $users;
+    }
+
     public static function checkPostIntro(Article $article): string
     {
         switch ($article->checkPostIntro()) {
