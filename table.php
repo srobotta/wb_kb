@@ -7,7 +7,7 @@ use KnowledgeBase\Kb;
 $htmlpage = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'table.html');
 $start = strpos($htmlpage, '<tbody>') + 7;
 $end = strpos($htmlpage, '</tbody>');
-$htmlsnippet = substr($htmlpage, $start, $end - $start + 8);
+$htmlsnippet = substr($htmlpage, $start, $end - $start);
 echo substr($htmlpage, 0, $start);
 $htmltail = substr($htmlpage, $end);
 unset($htmlpage);
@@ -75,9 +75,16 @@ foreach (Kb::getArticles() as $article) {
         }
     }
 
+    $editlink = str_replace(
+        "?p={$article->ID}",
+        "wp-admin/post.php?post={$article->ID}&action=edit",
+        $article->permalink()
+    );
+
     $data = [
         'ID' => $article->ID,
-        'PERMALINK' => "<a href=\"{$article->permalink()}\">[LINK]</a>",
+        'VIEWLINK' => "<a href=\"{$article->permalink()}\">[VIEW]</a>",
+        'EDITLINK' => "<a href=\"{$editlink}\">[EDIT]</a>",
         'TITLE' => $article->post_title,
         'WC' => $article->wordcount(),
         'PDF' => count($article->getInlinePdf()),
@@ -104,7 +111,6 @@ foreach (Kb::getArticles() as $article) {
         }
     }
     $tableRow = str_replace('__INFO__', $infoStr, $tableRow);
-
     echo $tableRow;
 }
-echo $htmltail;
+echo str_replace('__DATE__', date(DATE_RFC850), $htmltail);

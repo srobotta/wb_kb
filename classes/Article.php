@@ -178,9 +178,13 @@ class Article {
         while ($el = \array_shift($elements)) {
             if (\in_array($el->tag->name(), ['h1', 'h2', 'h3', 'h4', 'h5'])) {
                 $level = (int)substr($el->tag->name(), 1);
+                $label = trim(strip_tags($el->innerHTML));
+                if (empty($label)) {
+                    $label = '__EMPTY_HEADLINE__';
+                }
                 $headlines[] = [
                     'level' => $level,
-                    'label' => strip_tags($el->innerHTML),
+                    'label' => $label,
                 ];
             }
             if ($el->tag->name() !== 'text' && $el->hasChildren()) {
