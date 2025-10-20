@@ -6,7 +6,7 @@ use KnowledgeBase\Kb;
 
 /* @var KnowledgeBase\Article $article */
 foreach (Kb::getArticles() as $article) {
-    if (!$article->isGlossarEntry()) {
+    if (!$article->isGlossaryEntry()) {
         continue;
     }
     $headlines = $article->getH2List();

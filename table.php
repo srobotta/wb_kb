@@ -24,7 +24,7 @@ foreach (Kb::getArticles() as $article) {
     $error = [];
 
     $headlineCheck = true;
-    if ($article->isGlossarEntry()) {
+    if ($article->isGlossaryEntry()) {
         if (empty($article->getH2List())) {
             $headlineCheck = false;
             $error[] = 'Glossary article contains no headlines to check with expected structure.';
@@ -86,7 +86,7 @@ foreach (Kb::getArticles() as $article) {
         'WC' => $article->wordcount(),
         'PDF' => count($article->getInlinePdf()),
         'HEADLINE_CHECK' => $headlineCheck ? 'OK' : 'ERROR',
-        'GLOSSARY' => $article->isGlossarEntry() ? 'yes' : 'no',
+        'GLOSSARY' => $article->isGlossaryEntry() ? 'yes' : 'no',
         'TAGS' => implode(', ', $article->getTagsList()),
         'LICENSE_CHECK' => (!empty($ccLicense)) ? 'yes' : 'no',
     ];

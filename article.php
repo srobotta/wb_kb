@@ -69,7 +69,7 @@ if (!empty($emptyHeadlines)) {
 }
 
 // When a glossary entry, check that the expected headlines are in the correct order.
-if ($article->isGlossarEntry()) {
+if ($article->isGlossaryEntry()) {
     if (empty($article->getH2List())) {
         echo "\nNo headlines found to check with expected structure.\n";
     }

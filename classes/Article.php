@@ -164,7 +164,7 @@ class Article {
      *
      * @return bool
      */
-    public function isGlossarEntry(): bool
+    public function isGlossaryEntry(): bool
     {
         foreach ($this->categories as $category) {
             foreach ($category as $item) {
